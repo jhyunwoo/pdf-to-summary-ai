@@ -114,7 +114,7 @@ python server.py
 env:
   OLLAMA_HOST: http://localhost:11434
   MODEL_NAME: qwen3-vl:32b
-  PORT: 8000
+  PORT: 3000
   HOST: 0.0.0.0
   OLLAMA_MODELS: /workspace/.ollama/models
 ```
@@ -250,7 +250,7 @@ workdir: /code
 env:
   OLLAMA_HOST: http://localhost:11434
   MODEL_NAME: qwen3-vl:32b
-  PORT: 8000
+  PORT: 3000
   HOST: 0.0.0.0
   OLLAMA_MODELS: /workspace/.ollama/models
   PYTHONUNBUFFERED: "1"
@@ -372,7 +372,7 @@ ollama pull qwen3-vl:14b
 vessl run read <run-number>
 
 # 2. 로컬에서 포트 포워딩
-vessl run port-forward <run-number> 8000:8000
+vessl run port-forward <run-number> 3000:3000
 
 # 3. 방화벽 규칙 확인
 # VESSL 웹 UI > Run > Ports 섹션 확인
@@ -480,8 +480,8 @@ ollama ps                               # 실행 중인 모델 확인
 # 서버 관리
 ps aux | grep python                    # Python 프로세스 확인
 ps aux | grep ollama                    # Ollama 프로세스 확인
-netstat -tulpn | grep 8000              # 포트 사용 확인
-curl http://localhost:8000/health       # 헬스체크
+netstat -tulpn | grep 3000              # 포트 사용 확인
+curl http://localhost:3000/health       # 헬스체크
 ```
 
 ## ✅ 체크리스트

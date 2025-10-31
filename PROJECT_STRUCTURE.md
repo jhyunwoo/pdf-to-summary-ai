@@ -249,7 +249,7 @@ vessl run port-forward <run-number> 8000:8000
 |--------|--------|------|
 | `OLLAMA_HOST` | `http://localhost:11434` | Ollama 서버 주소 |
 | `MODEL_NAME` | `qwen3-vl:32b` | 사용할 모델 |
-| `PORT` | `8000` | API 서버 포트 |
+| `PORT` | `3000` | API 서버 포트 |
 | `HOST` | `0.0.0.0` | API 서버 호스트 |
 | `OLLAMA_MODELS` | `/workspace/.ollama/models` | 모델 저장 경로 |
 
@@ -279,7 +279,7 @@ vessl run port-forward <run-number> 8000:8000
    - 재시도: `ollama pull qwen3-vl:32b`
 
 3. **API 서버 연결 실패**
-   - 포트 확인: `netstat -tulpn | grep 8000`
+   - 포트 확인: `netstat -tulpn | grep 3000`
    - 로그 확인: `python server.py` (포그라운드 실행)
 
 4. **GPU 메모리 부족**

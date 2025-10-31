@@ -156,7 +156,7 @@ source venv/bin/activate
 # 환경 변수 설정 (선택사항)
 export OLLAMA_HOST=http://localhost:11434
 export MODEL_NAME=qwen3-vl:32b
-export PORT=8000
+export PORT=3000
 export HOST=0.0.0.0
 
 # 서버 시작 (포그라운드)
@@ -204,7 +204,7 @@ python server.py
 ### 포트 변경
 
 ```bash
-# 다른 포트로 실행
+# 다른 포트로 실행 (예: 8080)
 PORT=8080 python server.py
 ```
 
@@ -214,16 +214,16 @@ PORT=8080 python server.py
 
 ```bash
 # 기본 상태 확인
-curl http://localhost:8000/
+curl http://localhost:3000/
 
 # 헬스체크
-curl http://localhost:8000/health
+curl http://localhost:3000/health
 ```
 
 ### 2. 텍스트 처리 테스트
 
 ```bash
-curl -X POST "http://localhost:8000/api/generate/text" \
+curl -X POST "http://localhost:3000/api/generate/text" \
   -H "Content-Type: application/json" \
   -d '{
     "prompt": "인공지능이란 무엇인가요?",
@@ -238,7 +238,7 @@ curl -X POST "http://localhost:8000/api/generate/text" \
 # 이미지 파일 준비
 # test.jpg 파일이 현재 디렉토리에 있다고 가정
 
-curl -X POST "http://localhost:8000/api/generate" \
+curl -X POST "http://localhost:3000/api/generate" \
   -F "image=@test.jpg" \
   -F "prompt=이 이미지에 무엇이 있나요?" \
   -F "temperature=0.7" \
@@ -474,14 +474,14 @@ top
 top -p $(pgrep -f "python server.py")
 
 # 네트워크 연결
-netstat -an | grep 8000
+netstat -an | grep 3000
 ```
 
 ### API 응답 시간 측정
 
 ```bash
 # curl로 응답 시간 측정
-time curl -X POST "http://localhost:8000/api/generate/text" \
+time curl -X POST "http://localhost:3000/api/generate/text" \
   -H "Content-Type: application/json" \
   -d '{"prompt": "Hello", "max_tokens": 100}'
 ```
@@ -496,7 +496,7 @@ cat > .env << EOF
 OLLAMA_HOST=http://localhost:11434
 OLLAMA_MODELS=/workspace/.ollama/models
 MODEL_NAME=qwen3-vl:32b
-PORT=8000
+PORT=3000
 HOST=0.0.0.0
 PYTHONUNBUFFERED=1
 EOF
@@ -511,7 +511,7 @@ source .env
 # 현재 세션에만 적용
 export OLLAMA_HOST=http://localhost:11434
 export MODEL_NAME=qwen3-vl:32b
-export PORT=8000
+export PORT=3000
 
 # 영구적으로 설정 (bashrc에 추가)
 echo "export OLLAMA_HOST=http://localhost:11434" >> ~/.bashrc
@@ -594,7 +594,7 @@ server {
     server_name your-domain.com;
 
     location / {
-        proxy_pass http://localhost:8000;
+        proxy_pass http://localhost:3000;
         proxy_set_header Host \$host;
         proxy_set_header X-Real-IP \$remote_addr;
         proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
@@ -611,7 +611,7 @@ sudo systemctl reload nginx
 
 ## 🎯 다음 단계
 
-1. **API 문서 확인**: http://localhost:8000/docs
+1. **API 문서 확인**: http://localhost:3000/docs
 2. **예제 실행**: `python example_usage.py test.jpg`
 3. **커스텀 애플리케이션 개발**: API를 활용한 앱 개발
 4. **성능 튜닝**: 모델 파라미터 조정

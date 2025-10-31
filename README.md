@@ -197,7 +197,7 @@ vessl run create -f vessl.yaml
 |--------|--------|------|
 | `OLLAMA_HOST` | `http://localhost:11434` | Ollama 서버 주소 |
 | `MODEL_NAME` | `qwen3-vl:32b` | 사용할 모델 이름 |
-| `PORT` | `8000` | API 서버 포트 |
+| `PORT` | `3000` | API 서버 포트 |
 | `HOST` | `0.0.0.0` | API 서버 호스트 |
 | `OLLAMA_MODELS` | `/workspace/.ollama/models` | 모델 저장 경로 |
 
@@ -223,10 +223,10 @@ source venv/bin/activate
 
 ```bash
 # 서버 상태 확인
-curl http://localhost:8000/
+curl http://localhost:3000/
 
 # 헬스체크
-curl http://localhost:8000/health
+curl http://localhost:3000/health
 
 # 프로세스 확인
 ps aux | grep -E "ollama|python server.py"
@@ -235,8 +235,8 @@ ps aux | grep -E "ollama|python server.py"
 ### API 문서 확인
 
 브라우저에서 다음 주소로 접속:
-- Swagger UI: `http://localhost:8000/docs`
-- ReDoc: `http://localhost:8000/redoc`
+- Swagger UI: `http://localhost:3000/docs`
+- ReDoc: `http://localhost:3000/redoc`
 
 ## 📡 API 엔드포인트
 
@@ -254,7 +254,7 @@ ps aux | grep -E "ollama|python server.py"
 
 **Example:**
 ```bash
-curl -X POST "http://localhost:8000/api/generate" \
+curl -X POST "http://localhost:3000/api/generate" \
   -F "image=@example.jpg" \
   -F "prompt=이 이미지에 무엇이 있나요?" \
   -F "temperature=0.7" \
@@ -291,7 +291,7 @@ curl -X POST "http://localhost:8000/api/generate" \
 
 **Example:**
 ```bash
-curl -X POST "http://localhost:8000/api/generate/text" \
+curl -X POST "http://localhost:3000/api/generate/text" \
   -H "Content-Type: application/json" \
   -d '{
     "prompt": "한국의 수도는?",
@@ -308,7 +308,7 @@ curl -X POST "http://localhost:8000/api/generate/text" \
 
 **Example:**
 ```bash
-curl -X POST "http://localhost:8000/api/generate/stream" \
+curl -X POST "http://localhost:3000/api/generate/stream" \
   -F "image=@example.jpg" \
   -F "prompt=이 이미지를 설명해주세요" \
   -F "temperature=0.7"
@@ -342,10 +342,10 @@ python example_usage.py test.jpg
 
 ```bash
 # 1. 서버 상태 확인
-curl http://localhost:8000/health
+curl http://localhost:3000/health
 
 # 2. 텍스트 처리 테스트
-curl -X POST "http://localhost:8000/api/generate/text" \
+curl -X POST "http://localhost:3000/api/generate/text" \
   -H "Content-Type: application/json" \
   -d '{
     "prompt": "인공지능이란 무엇인가요?",
@@ -354,7 +354,7 @@ curl -X POST "http://localhost:8000/api/generate/text" \
   }'
 
 # 3. 이미지 처리 테스트
-curl -X POST "http://localhost:8000/api/generate" \
+curl -X POST "http://localhost:3000/api/generate" \
   -F "image=@test.jpg" \
   -F "prompt=이 이미지에 대해 설명해주세요" \
   -F "temperature=0.7" \
@@ -443,7 +443,7 @@ cat server.log
 python server.py
 
 # 포트가 사용 중인지 확인
-lsof -i :8000
+lsof -i :3000
 
 # 다른 포트로 시도
 PORT=8080 python server.py
@@ -494,7 +494,7 @@ uvicorn server:app --host 0.0.0.0 --port 8000 --workers 2
 개발 중에는 자동 리로드 활성화:
 
 ```bash
-uvicorn server:app --host 0.0.0.0 --port 8000 --reload
+uvicorn server:app --host 0.0.0.0 --port 3000 --reload
 ```
 
 ## 📝 라이센스

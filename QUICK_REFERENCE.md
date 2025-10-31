@@ -70,7 +70,7 @@ pkill -f "python server.py"
 
 # 상태 확인
 ps aux | grep "python server.py"
-lsof -i :8000
+lsof -i :3000
 
 # 로그 확인
 tail -f server.log
@@ -117,8 +117,8 @@ cat server.log
 
 ## 🌐 접속 주소
 
-- **API 문서**: http://localhost:8000/docs
-- **헬스체크**: http://localhost:8000/health
+- **API 문서**: http://localhost:3000/docs
+- **헬스체크**: http://localhost:3000/health
 - **Ollama API**: http://localhost:11434
 
 ## 📊 환경 변수
@@ -126,7 +126,7 @@ cat server.log
 ```bash
 export OLLAMA_HOST=http://localhost:11434
 export MODEL_NAME=qwen3-vl:32b
-export PORT=8000
+export PORT=3000
 export HOST=0.0.0.0
 ```
 

@@ -12,7 +12,7 @@ def example_1_text_only():
     print("예제 1: 텍스트만 처리")
     print("=" * 60)
     
-    url = "http://localhost:8000/api/generate/text"
+    url = "http://localhost:3000/api/generate/text"
     
     payload = {
         "prompt": "인공지능이란 무엇인가요?",
@@ -50,7 +50,7 @@ def example_2_image_analysis(image_path: str):
         print(f"❌ 이미지 파일을 찾을 수 없습니다: {image_path}")
         return
     
-    url = "http://localhost:8000/api/generate"
+    url = "http://localhost:3000/api/generate"
     
     with open(image_path, "rb") as f:
         files = {"image": f}
@@ -94,7 +94,7 @@ def example_3_image_qa(image_path: str):
         print(f"❌ 이미지 파일을 찾을 수 없습니다: {image_path}")
         return
     
-    url = "http://localhost:8000/api/generate"
+    url = "http://localhost:3000/api/generate"
     
     questions = [
         "이 이미지에 무엇이 보이나요?",
@@ -138,7 +138,7 @@ def example_4_document_ocr(image_path: str):
         print(f"❌ 이미지 파일을 찾을 수 없습니다: {image_path}")
         return
     
-    url = "http://localhost:8000/api/generate"
+    url = "http://localhost:3000/api/generate"
     
     with open(image_path, "rb") as f:
         files = {"image": f}
@@ -179,7 +179,7 @@ def example_5_multi_turn_conversation(image_path: str):
         print(f"❌ 이미지 파일을 찾을 수 없습니다: {image_path}")
         return
     
-    url = "http://localhost:8000/api/generate"
+    url = "http://localhost:3000/api/generate"
     
     # 첫 번째 질문
     print("\n👤 사용자: 이 이미지에 대해 설명해주세요.")

@@ -18,7 +18,7 @@ chmod +x *.sh
 ./run_server.sh
 ```
 
-완료! 🎉 브라우저에서 http://localhost:8000/docs 접속
+완료! 🎉 브라우저에서 http://localhost:3000/docs 접속
 
 ## 📁 프로젝트 파일 구조
 
@@ -96,7 +96,7 @@ python test_client.py test.jpg "이미지 설명해줘"
 ```bash
 export OLLAMA_HOST=http://localhost:11434
 export MODEL_NAME=qwen3-vl:32b
-export PORT=8000
+export PORT=3000
 export HOST=0.0.0.0
 ```
 
@@ -118,7 +118,7 @@ curl http://localhost:8000/health
 ollama list
 
 # 포트 확인
-lsof -i :8000
+lsof -i :3000
 lsof -i :11434
 ```
 
