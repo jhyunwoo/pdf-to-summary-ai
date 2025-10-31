@@ -53,10 +53,10 @@ curl http://localhost:11434/api/tags
 ollama list
 
 # 모델 다운로드
-ollama pull qwen3-vl:235b
+ollama pull qwen3-vl:32b
 
 # 모델 삭제
-ollama rm qwen3-vl:235b
+ollama rm qwen3-vl:32b
 ```
 
 ### API 서버
@@ -125,7 +125,7 @@ cat server.log
 
 ```bash
 export OLLAMA_HOST=http://localhost:11434
-export MODEL_NAME=qwen3-vl:235b
+export MODEL_NAME=qwen3-vl:32b
 export PORT=8000
 export HOST=0.0.0.0
 ```

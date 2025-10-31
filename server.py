@@ -21,7 +21,7 @@ app = FastAPI(
 
 # Ollama API 설정
 OLLAMA_HOST = os.getenv("OLLAMA_HOST", "http://localhost:11434")
-MODEL_NAME = os.getenv("MODEL_NAME", "qwen3-vl:235b")
+MODEL_NAME = os.getenv("MODEL_NAME", "qwen3-vl:32b")
 
 
 class TextPromptRequest(BaseModel):

@@ -1,6 +1,6 @@
 # VESSL 환경 설치 및 설정 가이드
 
-이 문서는 VESSL 환경에서 Ollama와 Qwen3-VL:235b 모델을 설정하는 방법을 자세히 설명합니다.
+이 문서는 VESSL 환경에서 Ollama와 Qwen3-VL:32b 모델을 설정하는 방법을 자세히 설명합니다.
 
 ## 📋 목차
 
@@ -26,7 +26,7 @@ VESSL은 머신러닝 워크플로우를 위한 클라우드 플랫폼입니다.
 ```yaml
 resources:
   cluster: vessl-gcp-oregon
-  preset: gpu-l-mem  # 최소 48GB VRAM
+  preset: gpu-m-mem  # 최소 24GB VRAM
 ```
 
 ### 권장 사양
@@ -34,14 +34,14 @@ resources:
 ```yaml
 resources:
   cluster: vessl-gcp-oregon
-  preset: gpu-xl-mem  # A100 80GB 또는 H100
+  preset: gpu-l-mem  # A100 40GB 또는 RTX A6000
 ```
 
 ### 디스크 공간
 
-- **모델 크기**: 약 235GB (qwen3-vl:235b)
-- **시스템 및 기타**: 약 50GB
-- **권장 총 용량**: 최소 500GB
+- **모델 크기**: 약 32GB (qwen3-vl:32b)
+- **시스템 및 기타**: 약 30GB
+- **권장 총 용량**: 최소 100GB
 
 ## 🚀 단계별 설치 가이드
 
@@ -113,7 +113,7 @@ python server.py
 ```yaml
 env:
   OLLAMA_HOST: http://localhost:11434
-  MODEL_NAME: qwen3-vl:235b
+  MODEL_NAME: qwen3-vl:32b
   PORT: 8000
   HOST: 0.0.0.0
   OLLAMA_MODELS: /workspace/.ollama/models
@@ -126,7 +126,7 @@ mount:
   /workspace:
     volume:
       name: ollama-models
-      size: 500Gi
+      size: 100Gi
 ```
 
 ### 방법 2: VESSL CLI 사용
@@ -225,7 +225,7 @@ run:
       sleep 10
       
       # 모델 다운로드
-      if ! ollama list | grep -q "qwen3-vl:235b"; then
+      if ! ollama list | grep -q "qwen3-vl:32b"; then
         echo "y" | ./download_model.sh
       else
         echo "Model already exists"
@@ -249,7 +249,7 @@ workdir: /code
 # 환경 변수
 env:
   OLLAMA_HOST: http://localhost:11434
-  MODEL_NAME: qwen3-vl:235b
+  MODEL_NAME: qwen3-vl:32b
   PORT: 8000
   HOST: 0.0.0.0
   OLLAMA_MODELS: /workspace/.ollama/models
@@ -280,10 +280,10 @@ vessl run create \
   --image quay.io/vessl-ai/torch:2.0.1-cuda11.8-r15 \
   --cluster vessl-gcp-oregon \
   --preset gpu-l-mem \
-  --volume ollama-models:/workspace:500Gi \
+  --volume ollama-models:/workspace:100Gi \
   --command "curl -fsSL https://ollama.com/install.sh | sh && \
              ollama serve & sleep 10 && \
-             ollama pull qwen3-vl:235b"
+             ollama pull qwen3-vl:32b"
 ```
 
 2. **동일한 볼륨을 재사용**하여 API 서버 Run 생성
@@ -339,11 +339,11 @@ vessl run create \
 **해결책**:
 ```bash
 # 다운로드 재시도
-ollama pull qwen3-vl:235b
+ollama pull qwen3-vl:32b
 
 # 또는 다운로드 타임아웃 증가
 export OLLAMA_DOWNLOAD_TIMEOUT=3600
-ollama pull qwen3-vl:235b
+ollama pull qwen3-vl:32b
 ```
 
 ### 문제 2: GPU 메모리 부족
@@ -351,13 +351,15 @@ ollama pull qwen3-vl:235b
 **증상**: `CUDA out of memory` 오류
 
 **해결책**:
-1. 더 큰 GPU 프리셋 사용 (A100 80GB 이상)
-2. 더 작은 모델 사용: `qwen3-vl:14b`
-3. 양자화 모델 사용: `qwen3-vl:235b-q4`
+1. 양자화 모델 사용
+2. 더 작은 모델 사용
 
 ```bash
-# 양자화 모델 다운로드
-ollama pull qwen3-vl:235b-q4
+# 양자화 모델 다운로드 (VRAM 절반)
+ollama pull qwen3-vl:32b-q4
+
+# 더 작은 모델
+ollama pull qwen3-vl:14b
 ```
 
 ### 문제 3: 포트 접근 불가
@@ -391,7 +393,7 @@ docker system prune -a
 mount:
   /workspace:
     volume:
-      size: 1000Gi  # 1TB로 증가
+      size: 200Gi  # 필요시 증가
 ```
 
 ### 문제 5: Ollama 서버 연결 실패
@@ -471,8 +473,8 @@ vessl run port-forward <run-number> 8000:8000  # 포트 포워딩
 
 # Ollama 관리
 ollama list                             # 설치된 모델 목록
-ollama pull <model-name>                # 모델 다운로드
-ollama rm <model-name>                  # 모델 삭제
+ollama pull qwen3-vl:32b                # 모델 다운로드
+ollama rm qwen3-vl:32b                  # 모델 삭제
 ollama ps                               # 실행 중인 모델 확인
 
 # 서버 관리

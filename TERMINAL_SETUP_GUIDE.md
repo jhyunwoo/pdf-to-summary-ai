@@ -16,9 +16,9 @@
 ### 필수 소프트웨어
 - **OS**: Linux (Ubuntu 20.04+) 또는 macOS
 - **Python**: 3.9 이상
-- **GPU**: NVIDIA GPU (선택사항, 하지만 강력 권장)
+- **GPU**: NVIDIA GPU (선택사항, 하지만 강력 권장 - 최소 24GB VRAM)
 - **CUDA**: 11.8+ (GPU 사용 시)
-- **디스크**: 최소 300GB 여유 공간
+- **디스크**: 최소 100GB 여유 공간
 
 ### 시스템 확인
 
@@ -128,20 +128,23 @@ curl http://localhost:11434/api/tags
 #### 4단계: Qwen3-VL 모델 다운로드
 
 ```bash
-# 모델 다운로드 (시간이 오래 걸림 - 약 235GB)
-ollama pull qwen3-vl:235b
+# 모델 다운로드 (약 32GB)
+ollama pull qwen3-vl:32b
 
 # 다운로드 확인
 ollama list
 ```
 
-**대안: 더 작은 모델 사용**
+**대안: 다른 크기의 모델**
 ```bash
-# 14B 버전 (더 작음)
+# 더 작은 14B 버전
 ollama pull qwen3-vl:14b
 
-# 또는 양자화 버전
-ollama pull qwen3-vl:235b-q4
+# 양자화 버전 (VRAM 절약)
+ollama pull qwen3-vl:32b-q4
+
+# 더 큰 모델 (더 많은 리소스 필요)
+ollama pull qwen3-vl:235b
 ```
 
 #### 5단계: API 서버 시작
@@ -152,7 +155,7 @@ source venv/bin/activate
 
 # 환경 변수 설정 (선택사항)
 export OLLAMA_HOST=http://localhost:11434
-export MODEL_NAME=qwen3-vl:235b
+export MODEL_NAME=qwen3-vl:32b
 export PORT=8000
 export HOST=0.0.0.0
 
@@ -387,10 +390,13 @@ df -h
 rm -rf /tmp/*
 
 # 모델 재다운로드
-ollama pull qwen3-vl:235b
+ollama pull qwen3-vl:32b
 
 # 더 작은 모델 사용
 ollama pull qwen3-vl:14b
+
+# 양자화 버전 사용 (절반 크기)
+ollama pull qwen3-vl:32b-q4
 ```
 
 ### 문제 4: API 서버 포트가 이미 사용 중
@@ -418,12 +424,12 @@ PORT=8080 python server.py
 # GPU 사용량 확인
 nvidia-smi
 
-# 더 작은 모델 사용
-export MODEL_NAME=qwen3-vl:14b
+# 양자화 모델 사용 (VRAM 절반으로 감소)
+export MODEL_NAME=qwen3-vl:32b-q4
 python server.py
 
-# 또는 양자화 모델
-export MODEL_NAME=qwen3-vl:235b-q4
+# 또는 더 작은 모델
+export MODEL_NAME=qwen3-vl:14b
 python server.py
 ```
 
@@ -489,7 +495,7 @@ time curl -X POST "http://localhost:8000/api/generate/text" \
 cat > .env << EOF
 OLLAMA_HOST=http://localhost:11434
 OLLAMA_MODELS=/workspace/.ollama/models
-MODEL_NAME=qwen3-vl:235b
+MODEL_NAME=qwen3-vl:32b
 PORT=8000
 HOST=0.0.0.0
 PYTHONUNBUFFERED=1
@@ -504,12 +510,12 @@ source .env
 ```bash
 # 현재 세션에만 적용
 export OLLAMA_HOST=http://localhost:11434
-export MODEL_NAME=qwen3-vl:235b
+export MODEL_NAME=qwen3-vl:32b
 export PORT=8000
 
 # 영구적으로 설정 (bashrc에 추가)
 echo "export OLLAMA_HOST=http://localhost:11434" >> ~/.bashrc
-echo "export MODEL_NAME=qwen3-vl:235b" >> ~/.bashrc
+echo "export MODEL_NAME=qwen3-vl:32b" >> ~/.bashrc
 source ~/.bashrc
 ```
 
@@ -532,7 +538,7 @@ rm -rf venv && ./setup_venv.sh
 ollama list
 
 # 모델 삭제
-ollama rm qwen3-vl:235b
+ollama rm qwen3-vl:32b
 
 # 디스크 사용량 확인
 du -sh .ollama/models/*

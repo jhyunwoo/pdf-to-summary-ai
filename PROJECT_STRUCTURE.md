@@ -88,12 +88,12 @@ pdf-to-summary-ai/
   4. 서버 상태 확인
 
 #### `download_model.sh`
-- **역할**: Qwen3-VL:235b 모델 다운로드
+- **역할**: Qwen3-VL:32b 모델 다운로드
 - **실행**: `./download_model.sh`
 - **동작**:
   1. 디스크 공간 확인
   2. Ollama 서버 상태 확인
-  3. 모델 다운로드 (235GB)
+  3. 모델 다운로드 (32GB)
   4. 다운로드 확인
 
 #### `quick_start.sh`
@@ -248,7 +248,7 @@ vessl run port-forward <run-number> 8000:8000
 | 변수명 | 기본값 | 설명 |
 |--------|--------|------|
 | `OLLAMA_HOST` | `http://localhost:11434` | Ollama 서버 주소 |
-| `MODEL_NAME` | `qwen3-vl:235b` | 사용할 모델 |
+| `MODEL_NAME` | `qwen3-vl:32b` | 사용할 모델 |
 | `PORT` | `8000` | API 서버 포트 |
 | `HOST` | `0.0.0.0` | API 서버 호스트 |
 | `OLLAMA_MODELS` | `/workspace/.ollama/models` | 모델 저장 경로 |
@@ -276,7 +276,7 @@ vessl run port-forward <run-number> 8000:8000
 
 2. **모델 다운로드 실패**
    - 디스크 공간 확인: `df -h`
-   - 재시도: `ollama pull qwen3-vl:235b`
+   - 재시도: `ollama pull qwen3-vl:32b`
 
 3. **API 서버 연결 실패**
    - 포트 확인: `netstat -tulpn | grep 8000`
