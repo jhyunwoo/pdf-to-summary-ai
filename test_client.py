@@ -1,5 +1,5 @@
 """
-Ollama Qwen3-VL API 서버 테스트 클라이언트
+Ollama Gemma3 API 서버 테스트 클라이언트
 """
 import requests
 import json
@@ -8,7 +8,7 @@ from pathlib import Path
 
 
 # API 서버 URL
-API_BASE_URL = "http://localhost:3000"
+API_BASE_URL = "http://165.132.141.231:30942"
 
 
 def test_server_status():
@@ -195,7 +195,7 @@ def main():
     test_health_check()
     
     # 3. 텍스트 처리 테스트
-    test_text_only("인공지능의 미래에 대해 간단히 설명해주세요.")
+    # test_text_only("Please describe about linux kernel.")
     
     # 4. 이미지 + 프롬프트 테스트 (이미지 파일이 있는 경우)
     if len(sys.argv) > 1:
@@ -217,4 +217,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 

@@ -1,6 +1,6 @@
 """
-Ollama Qwen3-VL API Server
-이미지와 프롬프트를 입력받아 ollama의 qwen3-vl:235b 모델로 처리하는 서버
+Ollama Gemma3 API Server
+텍스트 프롬프트를 입력받아 ollama의 gemma3:27b 모델로 처리하는 서버
 """
 import os
 import base64
@@ -14,14 +14,14 @@ from io import BytesIO
 from PIL import Image
 
 app = FastAPI(
-    title="Ollama Qwen3-VL API Server",
-    description="이미지와 프롬프트를 처리하는 Vision Language Model 서버",
+    title="Ollama Gemma3 API Server",
+    description="텍스트 프롬프트를 처리하는 Language Model 서버",
     version="1.0.0"
 )
 
 # Ollama API 설정
 OLLAMA_HOST = os.getenv("OLLAMA_HOST", "http://localhost:11434")
-MODEL_NAME = os.getenv("MODEL_NAME", "qwen3-vl:32b")
+MODEL_NAME = os.getenv("MODEL_NAME", "gemma3:27b")
 
 
 class TextPromptRequest(BaseModel):
@@ -51,7 +51,7 @@ async def root():
     """서버 상태 확인"""
     return {
         "status": "running",
-        "message": "Ollama Qwen3-VL API Server",
+        "message": "Ollama Gemma3 API Server",
         "model": MODEL_NAME,
         "ollama_host": OLLAMA_HOST
     }
@@ -290,7 +290,7 @@ if __name__ == "__main__":
     port = int(os.getenv("PORT", 3000))
     host = os.getenv("HOST", "0.0.0.0")
     
-    print(f"🚀 Ollama Qwen3-VL API Server 시작")
+    print(f"🚀 Ollama Gemma3 API Server 시작")
     print(f"📍 서버 주소: http://{host}:{port}")
     print(f"🤖 모델: {MODEL_NAME}")
     print(f"🔗 Ollama 호스트: {OLLAMA_HOST}")

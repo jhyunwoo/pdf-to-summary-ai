@@ -1,5 +1,5 @@
 """
-Ollama Qwen3-VL API 사용 예제
+Ollama Gemma3 API 사용 예제
 """
 import requests
 import json
@@ -214,7 +214,7 @@ def example_5_multi_turn_conversation(image_path: str):
 
 def main():
     """메인 함수"""
-    print("\n🚀 Ollama Qwen3-VL API 사용 예제\n")
+    print("\n🚀 Ollama Gemma3 API 사용 예제\n")
     
     # 예제 1: 텍스트만 처리
     example_1_text_only()

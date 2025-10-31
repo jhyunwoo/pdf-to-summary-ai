@@ -1,13 +1,13 @@
 #!/bin/bash
-# Qwen3-VL:32b 모델 다운로드 스크립트
+# Gemma3:27b 모델 다운로드 스크립트
 
 set -e
 
-MODEL_NAME="qwen3-vl:32b"
+MODEL_NAME="gemma3:27b"
 
 echo "📥 모델 다운로드를 시작합니다: $MODEL_NAME"
 echo ""
-echo "⚠️  주의: 이 모델은 약 32GB로 다운로드에 시간이 걸립니다."
+echo "⚠️  주의: 이 모델은 약 27GB로 다운로드에 시간이 걸립니다."
 echo "         충분한 디스크 공간이 있는지 확인하세요."
 echo ""
 

@@ -1,6 +1,6 @@
-# PDF to Summary AI - Ollama Qwen3-VL 서버
+# PDF to Summary AI - Ollama Gemma3 서버
 
-이 프로젝트는 Ollama와 Qwen3-VL:32b 모델을 사용하여 이미지와 프롬프트를 처리하는 Python API 서버입니다.
+이 프로젝트는 Ollama와 Gemma3:27b 모델을 사용하여 텍스트 프롬프트를 처리하는 Python API 서버입니다.
 
 ## 📋 목차
 
@@ -17,11 +17,11 @@
 ### 필수 요구사항
 - **OS**: Linux (Ubuntu 20.04+ 권장) 또는 macOS
 - **Python**: 3.9 이상
-- **GPU**: NVIDIA GPU (최소 24GB VRAM 권장)
-  - Qwen3-VL:32b는 중간 크기의 모델
+- **GPU**: NVIDIA GPU (최소 16GB VRAM 권장)
+  - Gemma3:27b는 중간 크기의 텍스트 모델
   - RTX 3090/4090, A5000, A100 등 권장
-- **디스크 공간**: 최소 100GB 이상 (모델 크기: ~32GB)
-- **메모리**: 최소 32GB RAM 권장
+- **디스크 공간**: 최소 50GB 이상 (모델 크기: ~27GB)
+- **메모리**: 최소 16GB RAM 권장
 - **네트워크**: 모델 다운로드를 위한 안정적인 인터넷 연결
 
 ### VESSL 권장 리소스 설정
@@ -88,20 +88,20 @@ curl http://localhost:11434/api/tags
 tail -f ollama.log
 ```
 
-#### 4단계: Qwen3-VL 모델 다운로드
+#### 4단계: Gemma3 모델 다운로드
 
 ```bash
-# 모델 다운로드 (약 32GB)
+# 모델 다운로드 (약 27GB)
 ./download_model.sh
 
 # 또는 직접 ollama 명령어 사용
-ollama pull qwen3-vl:32b
+ollama pull gemma3:27b
 
 # 설치된 모델 확인
 ollama list
 ```
 
-⚠️ **주의**: 모델 다운로드는 인터넷 속도에 따라 시간이 걸릴 수 있습니다 (약 30분~2시간).
+⚠️ **주의**: 모델 다운로드는 인터넷 속도에 따라 시간이 걸릴 수 있습니다 (약 30분~1시간).
 
 #### 5단계: Python API 서버 시작
 
@@ -196,7 +196,7 @@ vessl run create -f vessl.yaml
 | 변수명 | 기본값 | 설명 |
 |--------|--------|------|
 | `OLLAMA_HOST` | `http://localhost:11434` | Ollama 서버 주소 |
-| `MODEL_NAME` | `qwen3-vl:32b` | 사용할 모델 이름 |
+| `MODEL_NAME` | `gemma3:27b` | 사용할 모델 이름 |
 | `PORT` | `3000` | API 서버 포트 |
 | `HOST` | `0.0.0.0` | API 서버 호스트 |
 | `OLLAMA_MODELS` | `/workspace/.ollama/models` | 모델 저장 경로 |
@@ -266,7 +266,7 @@ curl -X POST "http://localhost:3000/api/generate" \
 {
   "success": true,
   "response": "이미지에는 고양이가 보입니다...",
-  "model": "qwen3-vl:32b",
+  "model": "gemma3:27b",
   "prompt": "이 이미지에 무엇이 있나요?",
   "done": true,
   "total_duration": 5000000000,
@@ -416,8 +416,8 @@ df -h
 ollama list
 
 # 모델 재다운로드
-ollama rm qwen3-vl:32b
-ollama pull qwen3-vl:32b
+ollama rm gemma3:27b
+ollama pull gemma3:27b
 ```
 
 ### GPU 메모리 부족

@@ -84,14 +84,14 @@ print_step "6" "Ollama 서버 시작 중..."
 echo ""
 
 # 7단계: 모델 확인
-print_step "7" "Qwen3-VL 모델 확인 중..."
-if ollama list | grep -q "qwen3-vl:235b"; then
+print_step "7" "Gemma3:27b 모델 확인 중..."
+if ollama list | grep -q "gemma3:27b"; then
     echo "✅ 모델이 이미 설치되어 있습니다."
 else
     print_warning "모델이 설치되어 있지 않습니다."
     echo ""
     echo "모델을 다운로드하시겠습니까? (y/n)"
-    echo "⚠️  주의: 모델 크기가 약 235GB이며 다운로드에 수 시간이 걸립니다."
+    echo "⚠️  주의: 모델 크기가 약 27GB이며 다운로드에 시간이 걸립니다."
     read -p "입력: " -n 1 -r
     echo
     if [[ $REPLY =~ ^[Yy]$ ]]; then
@@ -116,8 +116,8 @@ echo "또는 백그라운드로 실행:"
 echo "  ${GREEN}nohup python server.py > server.log 2>&1 &${NC}"
 echo ""
 echo "서버 시작 후 다음 URL로 접속하세요:"
-echo "  - API 문서: http://localhost:8000/docs"
-echo "  - 서버 상태: http://localhost:8000/health"
+echo "  - API 문서: http://localhost:3000/docs"
+echo "  - 서버 상태: http://localhost:3000/health"
 echo ""
 echo "테스트 클라이언트 실행:"
 echo "  ${GREEN}python test_client.py${NC}"

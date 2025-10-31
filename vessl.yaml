@@ -37,11 +37,11 @@ run:
       echo "⏳ Ollama 서버 안정화 대기..."
       sleep 10
       
-      echo "📥 Qwen3-VL 모델 다운로드 중..."
+      echo "📥 Gemma3 모델 다운로드 중..."
       echo "⚠️  이 작업은 인터넷 속도에 따라 시간이 걸릴 수 있습니다..."
       echo "y" | ./download_model.sh || {
         echo "모델 자동 다운로드 실패, 수동으로 다운로드 중..."
-        ollama pull qwen3-vl:32b
+        ollama pull gemma3:27b
       }
       
       echo "✅ 모델 다운로드 완료!"
@@ -65,7 +65,7 @@ workdir: /code
 # 환경 변수
 env:
   OLLAMA_HOST: http://localhost:11434
-  MODEL_NAME: qwen3-vl:32b
+  MODEL_NAME: gemma3:27b
   PORT: 3000
   HOST: 0.0.0.0
   OLLAMA_MODELS: /workspace/.ollama/models

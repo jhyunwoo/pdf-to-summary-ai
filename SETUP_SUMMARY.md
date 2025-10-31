@@ -84,7 +84,7 @@ python test_client.py test.jpg "이미지 설명해줘"
 | `setup_venv.sh` | Python 가상환경 생성 및 패키지 설치 | 최초 설치 시 |
 | `setup_ollama.sh` | Ollama 설치 | 최초 설치 시 |
 | `start_ollama.sh` | Ollama 서버 시작 | 서버 시작 전 |
-| `download_model.sh` | 모델 다운로드 (32GB) | 최초 1회만 |
+| `download_model.sh` | 모델 다운로드 (27GB) | 최초 1회만 |
 | `quick_start.sh` | 전체 자동 설치 | 처음 설정 시 |
 | `run_server.sh` | API 서버 실행 | 매번 서버 시작 시 |
 | `stop_all.sh` | 모든 서비스 종료 | 서버 종료 시 |
@@ -95,7 +95,7 @@ python test_client.py test.jpg "이미지 설명해줘"
 
 ```bash
 export OLLAMA_HOST=http://localhost:11434
-export MODEL_NAME=qwen3-vl:32b
+export MODEL_NAME=gemma3:27b
 export PORT=3000
 export HOST=0.0.0.0
 ```
@@ -125,9 +125,9 @@ lsof -i :11434
 ## ⚠️ 중요 참고사항
 
 1. **가상환경 활성화**: 모든 Python 명령어 실행 전에 `source venv/bin/activate` 필수
-2. **모델 크기**: Qwen3-VL:32b는 약 32GB입니다
-3. **GPU 권장**: NVIDIA GPU (최소 24GB VRAM) 권장
-4. **디스크 공간**: 최소 100GB 필요
+2. **모델 크기**: Gemma3:27b는 약 27GB입니다
+3. **GPU 권장**: NVIDIA GPU (최소 16GB VRAM) 권장
+4. **디스크 공간**: 최소 50GB 필요
 
 ## 🆘 문제 해결
 
