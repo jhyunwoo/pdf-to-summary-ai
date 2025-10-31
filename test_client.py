@@ -195,7 +195,7 @@ def main():
     test_health_check()
     
     # 3. 텍스트 처리 테스트
-    # test_text_only("Please describe about linux kernel.")
+    test_text_only("Please describe about linux kernel.")
     
     # 4. 이미지 + 프롬프트 테스트 (이미지 파일이 있는 경우)
     if len(sys.argv) > 1:
@@ -205,7 +205,7 @@ def main():
         test_image_with_prompt(image_path, prompt)
         
         # 5. 스트리밍 테스트
-        test_streaming(image_path, "이 이미지를 분석해주세요.")
+        # test_streaming(image_path, "이 이미지를 분석해주세요.")
     else:
         print("💡 이미지 테스트를 하려면 다음과 같이 실행하세요:")
         print("   python test_client.py <이미지_경로> [프롬프트]")
