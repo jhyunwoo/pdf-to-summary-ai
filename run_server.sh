@@ -61,8 +61,8 @@ echo ""
 
 # 4. 환경 변수 설정
 export OLLAMA_HOST=${OLLAMA_HOST:-"http://localhost:11434"}
-export MODEL_NAME=${MODEL_NAME:-"qwen3-vl:235b"}
-export PORT=${PORT:-8000}
+export MODEL_NAME=${MODEL_NAME:-"qwen3-vl:32b"}
+export PORT=${PORT:-3000}
 export HOST=${HOST:-"0.0.0.0"}
 
 echo "📋 서버 설정:"
