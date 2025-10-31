@@ -1,0 +1,79 @@
+name: ollama-qwen3vl-server
+description: Ollama Qwen3-VL Vision Language Model API Server
+
+# Docker 이미지 설정
+image: quay.io/vessl-ai/torch:2.0.1-cuda11.8-r15
+
+# 리소스 설정 (A100 또는 H100 권장)
+resources:
+  cluster: vessl-gcp-oregon  # 사용 가능한 클러스터로 변경
+  preset: gpu-l-mem  # 또는 A100/H100 프리셋
+
+# 코드 가져오기
+import:
+  /code:
+    git:
+      url: https://github.com/yourusername/pdf-to-summary-ai.git  # 실제 저장소 URL로 변경
+      ref: main
+
+# 실행 명령
+run:
+  - command: |
+      set -e
+      cd /code
+      
+      echo "📦 Python 의존성 설치 중..."
+      pip install -r requirements.txt
+      
+      echo "🔧 스크립트 실행 권한 부여..."
+      chmod +x setup_ollama.sh start_ollama.sh download_model.sh
+      
+      echo "📥 Ollama 설치 중..."
+      ./setup_ollama.sh
+      
+      echo "🚀 Ollama 서버 시작 중..."
+      ./start_ollama.sh
+      
+      echo "⏳ Ollama 서버 안정화 대기..."
+      sleep 10
+      
+      echo "📥 Qwen3-VL 모델 다운로드 중..."
+      echo "⚠️  이 작업은 수 시간이 걸릴 수 있습니다..."
+      echo "y" | ./download_model.sh || {
+        echo "모델 자동 다운로드 실패, 수동으로 다운로드 중..."
+        ollama pull qwen3-vl:235b
+      }
+      
+      echo "✅ 모델 다운로드 완료!"
+      ollama list
+      
+      echo "🌐 API 서버 시작 중..."
+      python server.py
+
+# 포트 설정
+ports:
+  - name: api
+    type: http
+    port: 8000
+  - name: ollama
+    type: http
+    port: 11434
+
+# 작업 디렉토리
+workdir: /code
+
+# 환경 변수
+env:
+  OLLAMA_HOST: http://localhost:11434
+  MODEL_NAME: qwen3-vl:235b
+  PORT: 8000
+  HOST: 0.0.0.0
+  OLLAMA_MODELS: /workspace/.ollama/models
+
+# 볼륨 마운트 (모델 영구 저장)
+mount:
+  /workspace:
+    volume:
+      name: ollama-models
+      size: 500Gi  # 모델 크기에 맞게 조정
+
