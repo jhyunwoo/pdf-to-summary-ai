@@ -8,7 +8,7 @@ from pathlib import Path
 
 
 # API 서버 URL
-API_BASE_URL = "http://165.132.141.231:30942"
+API_BASE_URL = "http://localhost:3000"
 
 
 def test_server_status():
