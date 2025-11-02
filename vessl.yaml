@@ -1,5 +1,5 @@
-name: ollama-qwen3vl-server
-description: Ollama Qwen3-VL Vision Language Model API Server
+name: ollama-gemma3-server
+description: Ollama Gemma3 Vision Language Model API Server
 
 # Docker 이미지 설정
 image: quay.io/vessl-ai/torch:2.0.1-cuda11.8-r15

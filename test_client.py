@@ -172,7 +172,7 @@ def test_streaming(image_url: str, prompt: str):
 
 def main():
     """메인 함수"""
-    print("\n🚀 Ollama Qwen3-VL API 테스트 클라이언트 (Cloudflare R2 URL)\n")
+    print("\n🚀 Ollama Gemma3 API 테스트 클라이언트 (Cloudflare R2 URL)\n")
     
     # 1. 서버 상태 확인
     test_server_status()

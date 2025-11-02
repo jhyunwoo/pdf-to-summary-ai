@@ -3,7 +3,7 @@
 
 set -e
 
-echo "🌐 Ollama Qwen3-VL API 서버 시작"
+echo "🌐 Ollama Gemma3 API 서버 시작"
 echo "================================"
 echo ""
 
@@ -50,10 +50,10 @@ echo ""
 
 # 3. 모델 확인
 echo "🤖 모델 확인 중..."
-if ollama list | grep -q "qwen3-vl"; then
-    echo "✅ Qwen3-VL 모델이 설치되어 있습니다."
+if ollama list | grep -q "gemma3"; then
+    echo "✅ Gemma3 모델이 설치되어 있습니다."
 else
-    echo -e "${YELLOW}⚠️  Qwen3-VL 모델이 설치되어 있지 않습니다.${NC}"
+    echo -e "${YELLOW}⚠️  Gemma3 모델이 설치되어 있지 않습니다.${NC}"
     echo "나중에 './download_model.sh'를 실행하여 모델을 다운로드하세요."
 fi
 

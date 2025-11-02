@@ -1,7 +1,7 @@
 #!/bin/bash
 # 빠른 시작 스크립트
 
-echo "🚀 Ollama Qwen3-VL 서버 빠른 시작 가이드"
+echo "🚀 Ollama Gemma3 서버 빠른 시작 가이드"
 echo "================================================"
 echo ""
 

@@ -155,7 +155,7 @@ def download_image_from_url(url: str) -> bytes:
 @app.post("/api/generate")
 async def generate_with_image(request: ImageUrlRequest, db: Session = Depends(get_db)):
     """
-    이미지 URL과 프롬프트를 받아서 Qwen3-VL 모델로 처리
+    이미지 URL과 프롬프트를 받아서 Gemma3 모델로 처리
     
     Args:
         request: 이미지 URL, 프롬프트, 생성 옵션을 포함한 요청
