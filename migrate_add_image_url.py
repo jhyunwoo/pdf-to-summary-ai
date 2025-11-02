@@ -12,7 +12,7 @@ def migrate_database():
     """image_url 컬럼을 analysis_records 테이블에 추가"""
     
     # 데이터베이스 URL 가져오기
-    database_url = os.getenv("DATABASE_URL")
+    database_url = os.getenv("DB_URL")
     
     if not database_url:
         print("⚠️  DATABASE_URL 환경 변수가 설정되지 않았습니다.")
