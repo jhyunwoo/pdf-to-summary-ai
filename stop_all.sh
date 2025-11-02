@@ -31,11 +31,22 @@ fi
 
 echo ""
 
+# Cloudflare Tunnel 종료
+echo "📍 Cloudflare Tunnel 종료 중..."
+if pgrep -f "cloudflared tunnel run" > /dev/null; then
+    pkill -f "cloudflared tunnel run"
+    echo "✅ Cloudflare Tunnel이 종료되었습니다."
+else
+    echo "ℹ️  실행 중인 Cloudflare Tunnel이 없습니다."
+fi
+
+echo ""
+
 # 프로세스 확인
 echo "🔍 실행 중인 프로세스 확인..."
-if pgrep -x "ollama" > /dev/null || pgrep -f "python server.py" > /dev/null; then
+if pgrep -x "ollama" > /dev/null || pgrep -f "python server.py" > /dev/null || pgrep -f "cloudflared tunnel run" > /dev/null; then
     echo "⚠️  일부 프로세스가 아직 실행 중입니다:"
-    ps aux | grep -E "ollama|python server.py" | grep -v grep
+    ps aux | grep -E "ollama|python server.py|cloudflared tunnel run" | grep -v grep
 else
     echo "✅ 모든 서비스가 종료되었습니다."
 fi
