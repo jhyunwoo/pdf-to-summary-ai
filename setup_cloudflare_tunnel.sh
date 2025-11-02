@@ -36,6 +36,13 @@ else
     exit 1
 fi
 
+# sudo 사용 여부 결정 (root 사용자인 경우 sudo 생략)
+if [ "$EUID" -eq 0 ]; then
+    SUDO=""
+else
+    SUDO="sudo"
+fi
+
 # cloudflared 설치 확인
 if ! command -v cloudflared &> /dev/null; then
     echo "cloudflared를 설치합니다..."
@@ -43,8 +50,8 @@ if ! command -v cloudflared &> /dev/null; then
     if [[ "$OS" == "linux" ]]; then
         # Linux 설치
         wget -q https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-${OS}-${ARCH} -O cloudflared
-        sudo mv cloudflared /usr/local/bin/
-        sudo chmod +x /usr/local/bin/cloudflared
+        $SUDO mv cloudflared /usr/local/bin/
+        $SUDO chmod +x /usr/local/bin/cloudflared
     elif [[ "$OS" == "darwin" ]]; then
         # macOS 설치
         if command -v brew &> /dev/null; then
@@ -52,8 +59,8 @@ if ! command -v cloudflared &> /dev/null; then
         else
             curl -L https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-${OS}-${ARCH}.tgz -o cloudflared.tgz
             tar -xzf cloudflared.tgz
-            sudo mv cloudflared /usr/local/bin/
-            sudo chmod +x /usr/local/bin/cloudflared
+            $SUDO mv cloudflared /usr/local/bin/
+            $SUDO chmod +x /usr/local/bin/cloudflared
             rm cloudflared.tgz
         fi
     fi
@@ -146,9 +153,15 @@ EOF
     echo "  nohup cloudflared tunnel run $TUNNEL_NAME > cloudflared.log 2>&1 &"
     echo ""
     echo "⚙️  systemd 서비스로 등록하려면 (Linux):"
-    echo "  sudo cloudflared service install"
-    echo "  sudo systemctl start cloudflared"
-    echo "  sudo systemctl enable cloudflared"
+    if [ "$EUID" -eq 0 ]; then
+        echo "  cloudflared service install"
+        echo "  systemctl start cloudflared"
+        echo "  systemctl enable cloudflared"
+    else
+        echo "  sudo cloudflared service install"
+        echo "  sudo systemctl start cloudflared"
+        echo "  sudo systemctl enable cloudflared"
+    fi
     echo ""
     echo "✅ 이제 https://$DOMAIN 으로 접속할 수 있습니다!"
     echo ""
