@@ -1,7 +1,7 @@
 """
 Database models for storing analysis records
 """
-from sqlalchemy import Column, Integer, String, Text, Float, DateTime, Boolean
+from sqlalchemy import Column, Integer, BigInteger, String, Text, Float, DateTime, Boolean
 from sqlalchemy.sql import func
 from database import Base
 
@@ -35,8 +35,8 @@ class AnalysisRecord(Base):
     error_message = Column(Text)  # 에러 메시지 (실패 시)
     
     # 성능 메트릭
-    total_duration = Column(Integer)  # 총 처리 시간 (나노초)
-    load_duration = Column(Integer)  # 모델 로드 시간 (나노초)
+    total_duration = Column(BigInteger)  # 총 처리 시간 (나노초)
+    load_duration = Column(BigInteger)  # 모델 로드 시간 (나노초)
     prompt_eval_count = Column(Integer)  # 프롬프트 평가 토큰 수
     eval_count = Column(Integer)  # 생성된 토큰 수
     
