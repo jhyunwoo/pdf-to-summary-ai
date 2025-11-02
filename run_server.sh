@@ -71,7 +71,28 @@ echo "  - Model: $MODEL_NAME"
 echo "  - API Host: $HOST:$PORT"
 echo ""
 
-# 5. 서버 시작
+# 5. Cloudflare Tunnel 옵션
+echo "🌐 Cloudflare Tunnel을 시작하시겠습니까?"
+echo "  (HTTPS로 외부 접속을 원하시면 Y를 선택하세요)"
+read -p "Cloudflare Tunnel 시작? (y/N): " -n 1 -r
+echo
+echo ""
+
+START_TUNNEL=false
+if [[ $REPLY =~ ^[Yy]$ ]]; then
+    if [ -f ~/.cloudflared/config.yml ]; then
+        START_TUNNEL=true
+        echo "✅ Cloudflare Tunnel을 시작합니다..."
+    else
+        echo -e "${YELLOW}⚠️  Cloudflare Tunnel이 설정되지 않았습니다.${NC}"
+        echo "먼저 './setup_cloudflare_tunnel.sh'를 실행하여 설정하세요."
+        echo "지금은 API 서버만 시작합니다."
+    fi
+fi
+
+echo ""
+
+# 6. 서버 시작
 echo "🚀 API 서버를 시작합니다..."
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo ""
@@ -102,6 +123,32 @@ if [[ $REPLY == "2" ]]; then
         echo "🌐 서버 주소:"
         echo "  - API 문서: http://localhost:$PORT/docs"
         echo "  - 서버 상태: http://localhost:$PORT/health"
+        
+        # Cloudflare Tunnel 시작
+        if [ "$START_TUNNEL" = true ]; then
+            echo ""
+            echo "🌐 Cloudflare Tunnel 시작 중..."
+            ./setup_cloudflare_tunnel.sh start
+            
+            if [ $? -eq 0 ]; then
+                echo ""
+                echo "✅ 모든 서비스가 시작되었습니다!"
+                echo ""
+                echo "📋 실행 중인 서비스:"
+                echo "  - API 서버 (PID: $SERVER_PID)"
+                echo "  - Cloudflare Tunnel"
+                echo ""
+                if [ -f ~/.cloudflared/config.yml ]; then
+                    DOMAIN=$(grep "hostname:" ~/.cloudflared/config.yml | head -1 | awk '{print $2}')
+                    if [ ! -z "$DOMAIN" ]; then
+                        echo "🌍 외부 접속 주소:"
+                        echo "  - https://$DOMAIN"
+                        echo "  - https://$DOMAIN/docs"
+                        echo "  - https://$DOMAIN/health"
+                    fi
+                fi
+            fi
+        fi
     else
         echo -e "${RED}❌ 서버 시작에 실패했습니다.${NC}"
         echo "로그를 확인하세요: cat server.log"
@@ -113,6 +160,25 @@ else
     echo "  - API 문서: http://localhost:$PORT/docs"
     echo "  - 서버 상태: http://localhost:$PORT/health"
     echo ""
+    
+    # Cloudflare Tunnel 시작 (백그라운드)
+    if [ "$START_TUNNEL" = true ]; then
+        echo "🌐 Cloudflare Tunnel을 백그라운드로 시작합니다..."
+        ./setup_cloudflare_tunnel.sh start
+        
+        if [ -f ~/.cloudflared/config.yml ]; then
+            DOMAIN=$(grep "hostname:" ~/.cloudflared/config.yml | head -1 | awk '{print $2}')
+            if [ ! -z "$DOMAIN" ]; then
+                echo ""
+                echo "🌍 외부 접속 주소:"
+                echo "  - https://$DOMAIN"
+                echo "  - https://$DOMAIN/docs"
+                echo "  - https://$DOMAIN/health"
+            fi
+        fi
+        echo ""
+    fi
+    
     echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
     echo ""
     python server.py
