@@ -5,6 +5,7 @@ Ollama Gemma3 API Server
 import os
 import base64
 from typing import Optional
+from contextlib import asynccontextmanager
 from fastapi import FastAPI, File, UploadFile, Form, HTTPException, Depends
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
@@ -22,18 +23,32 @@ load_dotenv()
 from database import get_db, init_db
 from models import AnalysisRecord
 
+
+# 최신 FastAPI lifespan 이벤트 핸들러
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """애플리케이션 생명주기 관리"""
+    # Startup
+    try:
+        print("🔧 데이터베이스 초기화 중...")
+        init_db()
+        print("✅ 데이터베이스 초기화 완료")
+    except Exception as e:
+        print(f"⚠️  데이터베이스 초기화 실패: {e}")
+        print("⚠️  DB 기능 없이 서버를 시작합니다. DB 설정을 확인하세요.")
+    
+    yield
+    
+    # Shutdown
+    print("🛑 서버 종료 중...")
+
+
 app = FastAPI(
     title="Ollama Gemma3 API Server",
     description="텍스트 프롬프트를 처리하는 Language Model 서버",
-    version="1.0.0"
+    version="1.0.0",
+    lifespan=lifespan
 )
-
-# 서버 시작 시 DB 초기화
-@app.on_event("startup")
-async def startup_event():
-    """서버 시작 시 데이터베이스 초기화"""
-    init_db()
-    print("✅ 데이터베이스 초기화 완료")
 
 # Ollama API 설정
 OLLAMA_HOST = os.getenv("OLLAMA_HOST", "http://localhost:11434")
@@ -109,22 +124,31 @@ async def health_check():
         )
 
 
+class ImageUrlRequest(BaseModel):
+    """이미지 URL로 요청하는 모델"""
+    image_url: str
+    prompt: str
+    temperature: Optional[float] = 0.7
+    max_tokens: Optional[int] = 2000
+
+
+def download_image_from_url(url: str) -> bytes:
+    """URL에서 이미지를 다운로드"""
+    try:
+        response = requests.get(url, timeout=30)
+        response.raise_for_status()
+        return response.content
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"이미지 다운로드 실패: {str(e)}")
+
+
 @app.post("/api/generate")
-async def generate_with_image(
-    image: UploadFile = File(..., description="입력 이미지 파일"),
-    prompt: str = Form(..., description="처리할 프롬프트"),
-    temperature: float = Form(0.7, description="생성 온도 (0.0-1.0)"),
-    max_tokens: int = Form(2000, description="최대 토큰 수"),
-    db: Session = Depends(get_db)
-):
+async def generate_with_image(request: ImageUrlRequest, db: Session = Depends(get_db)):
     """
-    이미지와 프롬프트를 받아서 Qwen3-VL 모델로 처리
+    이미지 URL과 프롬프트를 받아서 Qwen3-VL 모델로 처리
     
     Args:
-        image: 업로드된 이미지 파일
-        prompt: 처리할 텍스트 프롬프트
-        temperature: 생성 온도 (낮을수록 결정적, 높을수록 창의적)
-        max_tokens: 생성할 최대 토큰 수
+        request: 이미지 URL, 프롬프트, 생성 옵션을 포함한 요청
         db: 데이터베이스 세션
     
     Returns:
@@ -133,17 +157,17 @@ async def generate_with_image(
     # DB 레코드 초기화
     record = AnalysisRecord(
         endpoint="/api/generate",
-        prompt=prompt,
+        prompt=request.prompt,
         has_image=True,
-        image_filename=image.filename,
-        temperature=temperature,
-        max_tokens=max_tokens,
+        image_url=request.image_url,
+        temperature=request.temperature,
+        max_tokens=request.max_tokens,
         model=MODEL_NAME
     )
     
     try:
-        # 이미지 읽기
-        image_bytes = await image.read()
+        # URL에서 이미지 다운로드
+        image_bytes = download_image_from_url(request.image_url)
         
         # 이미지 유효성 검증
         if not validate_image(image_bytes):
@@ -159,12 +183,12 @@ async def generate_with_image(
         # Ollama API 요청 준비
         payload = {
             "model": MODEL_NAME,
-            "prompt": prompt,
+            "prompt": request.prompt,
             "images": [image_base64],
             "stream": False,
             "options": {
-                "temperature": temperature,
-                "num_predict": max_tokens
+                "temperature": request.temperature,
+                "num_predict": request.max_tokens
             }
         }
         
@@ -202,7 +226,7 @@ async def generate_with_image(
             "success": True,
             "response": result.get("response", ""),
             "model": MODEL_NAME,
-            "prompt": prompt,
+            "prompt": request.prompt,
             "done": result.get("done", False),
             "context": result.get("context", []),
             "total_duration": result.get("total_duration"),
@@ -387,32 +411,34 @@ async def get_analysis_record(record_id: int, db: Session = Depends(get_db)):
     }
 
 
+class ImageUrlStreamRequest(BaseModel):
+    """이미지 URL 스트리밍 요청 모델"""
+    image_url: str
+    prompt: str
+    temperature: Optional[float] = 0.7
+
+
 @app.post("/api/generate/stream")
-async def generate_with_image_stream(
-    image: UploadFile = File(..., description="입력 이미지 파일"),
-    prompt: str = Form(..., description="처리할 프롬프트"),
-    temperature: float = Form(0.7, description="생성 온도 (0.0-1.0)"),
-    db: Session = Depends(get_db)
-):
+async def generate_with_image_stream(request: ImageUrlStreamRequest, db: Session = Depends(get_db)):
     """
-    이미지와 프롬프트를 받아서 스트리밍 방식으로 응답
+    이미지 URL과 프롬프트를 받아서 스트리밍 방식으로 응답
     (실시간으로 결과를 받아볼 수 있음)
     """
     # DB 레코드 초기화
     record = AnalysisRecord(
         endpoint="/api/generate/stream",
-        prompt=prompt,
+        prompt=request.prompt,
         has_image=True,
-        image_filename=image.filename,
-        temperature=temperature,
+        image_url=request.image_url,
+        temperature=request.temperature,
         model=MODEL_NAME
     )
     
     try:
         from fastapi.responses import StreamingResponse
         
-        # 이미지 읽기
-        image_bytes = await image.read()
+        # URL에서 이미지 다운로드
+        image_bytes = download_image_from_url(request.image_url)
         
         # 이미지 유효성 검증
         if not validate_image(image_bytes):
@@ -428,11 +454,11 @@ async def generate_with_image_stream(
         # Ollama API 요청 준비
         payload = {
             "model": MODEL_NAME,
-            "prompt": prompt,
+            "prompt": request.prompt,
             "images": [image_base64],
             "stream": True,
             "options": {
-                "temperature": temperature
+                "temperature": request.temperature
             }
         }
         

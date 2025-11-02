@@ -274,3 +274,4 @@ pg_dump -U username pdf_summary_db > backup_$(date +%Y%m%d).sql
 
 4. **접근 제한**: 프로덕션 환경에서는 `/api/records` 엔드포인트에 인증을 추가하는 것을 권장합니다.
 
+ls

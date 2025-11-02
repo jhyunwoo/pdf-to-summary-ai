@@ -21,7 +21,8 @@ class AnalysisRecord(Base):
     endpoint = Column(String(100), nullable=False, index=True)  # API 엔드포인트
     prompt = Column(Text, nullable=False)  # 입력 프롬프트
     has_image = Column(Boolean, default=False)  # 이미지 포함 여부
-    image_filename = Column(String(255))  # 이미지 파일명 (있는 경우)
+    image_filename = Column(String(255))  # 이미지 파일명 (있는 경우) - 레거시
+    image_url = Column(Text)  # 이미지 URL (Cloudflare R2 등)
     
     # 생성 옵션
     temperature = Column(Float)
@@ -52,6 +53,7 @@ class AnalysisRecord(Base):
             "prompt": self.prompt,
             "has_image": self.has_image,
             "image_filename": self.image_filename,
+            "image_url": self.image_url,
             "temperature": self.temperature,
             "max_tokens": self.max_tokens,
             "response": self.response,
