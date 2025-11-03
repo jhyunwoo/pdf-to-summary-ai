@@ -181,10 +181,14 @@ async def generate_with_image(request: ImageUrlRequest, db: Session = Depends(ge
         
         # 이미지 유효성 검증
         if not validate_image(image_bytes):
-            record.success = False
-            record.error_message = "유효하지 않은 이미지 형식입니다."
-            db.add(record)
-            db.commit()
+            try:
+                db.rollback()
+                record.success = False
+                record.error_message = "유효하지 않은 이미지 형식입니다."
+                db.add(record)
+                db.commit()
+            except Exception:
+                db.rollback()
             raise HTTPException(status_code=400, detail="유효하지 않은 이미지 형식입니다.")
         
         # 이미지를 base64로 인코딩
@@ -210,10 +214,14 @@ async def generate_with_image(request: ImageUrlRequest, db: Session = Depends(ge
         )
         
         if response.status_code != 200:
-            record.success = False
-            record.error_message = f"Ollama API 오류: {response.text}"
-            db.add(record)
-            db.commit()
+            try:
+                db.rollback()
+                record.success = False
+                record.error_message = f"Ollama API 오류: {response.text}"
+                db.add(record)
+                db.commit()
+            except Exception:
+                db.rollback()
             raise HTTPException(
                 status_code=response.status_code,
                 detail=f"Ollama API 오류: {response.text}"
@@ -222,15 +230,22 @@ async def generate_with_image(request: ImageUrlRequest, db: Session = Depends(ge
         result = response.json()
         
         # DB에 성공 결과 저장
-        record.response = result.get("response", "")
-        record.success = True
-        record.total_duration = result.get("total_duration")
-        record.load_duration = result.get("load_duration")
-        record.prompt_eval_count = result.get("prompt_eval_count")
-        record.eval_count = result.get("eval_count")
-        db.add(record)
-        db.commit()
-        db.refresh(record)
+        record_id = None
+        try:
+            record.response = result.get("response", "")
+            record.success = True
+            record.total_duration = result.get("total_duration")
+            record.load_duration = result.get("load_duration")
+            record.prompt_eval_count = result.get("prompt_eval_count")
+            record.eval_count = result.get("eval_count")
+            db.add(record)
+            db.commit()
+            db.refresh(record)
+            record_id = record.id
+        except Exception as db_error:
+            # DB 저장 실패 시 롤백하고 계속 진행 (API 응답은 성공)
+            db.rollback()
+            print(f"⚠️  DB 저장 실패 (응답은 정상 반환): {db_error}")
         
         return {
             "success": True,
@@ -243,29 +258,42 @@ async def generate_with_image(request: ImageUrlRequest, db: Session = Depends(ge
             "load_duration": result.get("load_duration"),
             "prompt_eval_count": result.get("prompt_eval_count"),
             "eval_count": result.get("eval_count"),
-            "record_id": record.id  # DB 레코드 ID 추가
+            "record_id": record_id  # DB 레코드 ID 추가 (실패 시 None)
         }
         
     except requests.exceptions.Timeout:
-        record.success = False
-        record.error_message = "Ollama 서버 응답 시간 초과"
-        db.add(record)
-        db.commit()
+        try:
+            db.rollback()
+            record.success = False
+            record.error_message = "Ollama 서버 응답 시간 초과"
+            db.add(record)
+            db.commit()
+        except Exception:
+            db.rollback()
         raise HTTPException(status_code=504, detail="Ollama 서버 응답 시간 초과")
     except requests.exceptions.ConnectionError:
-        record.success = False
-        record.error_message = "Ollama 서버에 연결할 수 없습니다."
-        db.add(record)
-        db.commit()
+        try:
+            db.rollback()
+            record.success = False
+            record.error_message = "Ollama 서버에 연결할 수 없습니다."
+            db.add(record)
+            db.commit()
+        except Exception:
+            db.rollback()
         raise HTTPException(status_code=503, detail="Ollama 서버에 연결할 수 없습니다.")
     except HTTPException:
         # HTTPException은 이미 처리됨
         raise
     except Exception as e:
-        record.success = False
-        record.error_message = str(e)
-        db.add(record)
-        db.commit()
+        try:
+            db.rollback()
+            record.success = False
+            record.error_message = str(e)
+            db.add(record)
+            db.commit()
+        except Exception as db_error:
+            db.rollback()
+            print(f"⚠️  DB 저장 실패 (에러 기록 불가): {db_error}")
         raise HTTPException(status_code=500, detail=f"서버 오류: {str(e)}")
 
 
@@ -311,10 +339,14 @@ async def generate_text_only(request: TextPromptRequest, db: Session = Depends(g
         )
         
         if response.status_code != 200:
-            record.success = False
-            record.error_message = f"Ollama API 오류: {response.text}"
-            db.add(record)
-            db.commit()
+            try:
+                db.rollback()
+                record.success = False
+                record.error_message = f"Ollama API 오류: {response.text}"
+                db.add(record)
+                db.commit()
+            except Exception:
+                db.rollback()
             raise HTTPException(
                 status_code=response.status_code,
                 detail=f"Ollama API 오류: {response.text}"
@@ -323,15 +355,22 @@ async def generate_text_only(request: TextPromptRequest, db: Session = Depends(g
         result = response.json()
         
         # DB에 성공 결과 저장
-        record.response = result.get("response", "")
-        record.success = True
-        record.total_duration = result.get("total_duration")
-        record.load_duration = result.get("load_duration")
-        record.prompt_eval_count = result.get("prompt_eval_count")
-        record.eval_count = result.get("eval_count")
-        db.add(record)
-        db.commit()
-        db.refresh(record)
+        record_id = None
+        try:
+            record.response = result.get("response", "")
+            record.success = True
+            record.total_duration = result.get("total_duration")
+            record.load_duration = result.get("load_duration")
+            record.prompt_eval_count = result.get("prompt_eval_count")
+            record.eval_count = result.get("eval_count")
+            db.add(record)
+            db.commit()
+            db.refresh(record)
+            record_id = record.id
+        except Exception as db_error:
+            # DB 저장 실패 시 롤백하고 계속 진행
+            db.rollback()
+            print(f"⚠️  DB 저장 실패 (응답은 정상 반환): {db_error}")
         
         return {
             "success": True,
@@ -339,29 +378,42 @@ async def generate_text_only(request: TextPromptRequest, db: Session = Depends(g
             "model": MODEL_NAME,
             "prompt": request.prompt,
             "done": result.get("done", False),
-            "record_id": record.id  # DB 레코드 ID 추가
+            "record_id": record_id  # DB 레코드 ID 추가 (실패 시 None)
         }
         
     except requests.exceptions.Timeout:
-        record.success = False
-        record.error_message = "Ollama 서버 응답 시간 초과"
-        db.add(record)
-        db.commit()
+        try:
+            db.rollback()
+            record.success = False
+            record.error_message = "Ollama 서버 응답 시간 초과"
+            db.add(record)
+            db.commit()
+        except Exception:
+            db.rollback()
         raise HTTPException(status_code=504, detail="Ollama 서버 응답 시간 초과")
     except requests.exceptions.ConnectionError:
-        record.success = False
-        record.error_message = "Ollama 서버에 연결할 수 없습니다."
-        db.add(record)
-        db.commit()
+        try:
+            db.rollback()
+            record.success = False
+            record.error_message = "Ollama 서버에 연결할 수 없습니다."
+            db.add(record)
+            db.commit()
+        except Exception:
+            db.rollback()
         raise HTTPException(status_code=503, detail="Ollama 서버에 연결할 수 없습니다.")
     except HTTPException:
         # HTTPException은 이미 처리됨
         raise
     except Exception as e:
-        record.success = False
-        record.error_message = str(e)
-        db.add(record)
-        db.commit()
+        try:
+            db.rollback()
+            record.success = False
+            record.error_message = str(e)
+            db.add(record)
+            db.commit()
+        except Exception as db_error:
+            db.rollback()
+            print(f"⚠️  DB 저장 실패 (에러 기록 불가): {db_error}")
         raise HTTPException(status_code=500, detail=f"서버 오류: {str(e)}")
 
 
@@ -452,10 +504,14 @@ async def generate_with_image_stream(request: ImageUrlStreamRequest, db: Session
         
         # 이미지 유효성 검증
         if not validate_image(image_bytes):
-            record.success = False
-            record.error_message = "유효하지 않은 이미지 형식입니다."
-            db.add(record)
-            db.commit()
+            try:
+                db.rollback()
+                record.success = False
+                record.error_message = "유효하지 않은 이미지 형식입니다."
+                db.add(record)
+                db.commit()
+            except Exception:
+                db.rollback()
             raise HTTPException(status_code=400, detail="유효하지 않은 이미지 형식입니다.")
         
         # 이미지를 base64로 인코딩
@@ -501,21 +557,29 @@ async def generate_with_image_stream(request: ImageUrlStreamRequest, db: Session
                         yield line + b'\n'
                 
                 # 스트리밍 완료 후 DB에 저장
-                record.response = "".join(full_response)
-                record.success = True
-                record.total_duration = last_metrics.get("total_duration")
-                record.load_duration = last_metrics.get("load_duration")
-                record.prompt_eval_count = last_metrics.get("prompt_eval_count")
-                record.eval_count = last_metrics.get("eval_count")
-                db.add(record)
-                db.commit()
+                try:
+                    record.response = "".join(full_response)
+                    record.success = True
+                    record.total_duration = last_metrics.get("total_duration")
+                    record.load_duration = last_metrics.get("load_duration")
+                    record.prompt_eval_count = last_metrics.get("prompt_eval_count")
+                    record.eval_count = last_metrics.get("eval_count")
+                    db.add(record)
+                    db.commit()
+                except Exception as db_error:
+                    db.rollback()
+                    print(f"⚠️  DB 저장 실패 (스트리밍 완료): {db_error}")
                 
             except Exception as e:
-                record.success = False
-                record.error_message = str(e)
-                record.response = "".join(full_response) if full_response else None
-                db.add(record)
-                db.commit()
+                try:
+                    db.rollback()
+                    record.success = False
+                    record.error_message = str(e)
+                    record.response = "".join(full_response) if full_response else None
+                    db.add(record)
+                    db.commit()
+                except Exception:
+                    db.rollback()
                 yield json.dumps({"error": str(e)}).encode() + b'\n'
         
         return StreamingResponse(
@@ -526,10 +590,15 @@ async def generate_with_image_stream(request: ImageUrlStreamRequest, db: Session
     except HTTPException:
         raise
     except Exception as e:
-        record.success = False
-        record.error_message = str(e)
-        db.add(record)
-        db.commit()
+        try:
+            db.rollback()
+            record.success = False
+            record.error_message = str(e)
+            db.add(record)
+            db.commit()
+        except Exception as db_error:
+            db.rollback()
+            print(f"⚠️  DB 저장 실패 (에러 기록 불가): {db_error}")
         raise HTTPException(status_code=500, detail=f"서버 오류: {str(e)}")
 
 
